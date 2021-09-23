@@ -2,7 +2,7 @@ import databases
 import sqlalchemy as sqlalchemy
 from fastapi import FastAPI
 
-from api.routers.video import router
+from api.routers.video import router as video_router
 
 app = FastAPI()
 
@@ -35,4 +35,4 @@ async def shutdown() -> None:
 #     database = database
 
 
-app.include_router(router)
+app.include_router(video_router)

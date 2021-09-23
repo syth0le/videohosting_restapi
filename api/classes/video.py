@@ -3,13 +3,15 @@ from api.db.video import VideoDB as db
 
 class Video:
 
-    def __init__(self, id: str, skip: int = 0):
+    def __init__(self, id: str,
+                 skip: int = 0):
         self.id = id
         self.skip = skip
 
     async def getVideo(self):
         _video = db.getVideoById(self.id)
-        return "video"
+        return _video
+
 
     async def getPointOfVideo(self, next):
         self.skip = next

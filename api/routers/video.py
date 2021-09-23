@@ -1,4 +1,8 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, File, BackgroundTasks, Form, UploadFile
+from starlette.responses import StreamingResponse
+
+from api.handlers.single_video import saveVideo
+from api.schemas.video import VideoGetResponse
 
 router = APIRouter(prefix="/video",
                    tags=["video"])
@@ -15,7 +19,7 @@ async def getVideo(id: int):
     return f"video with id: {id}"
 
 
-@router.get("/{id}")
+@router.get("/description/{id}")
 async def getVideoDescr(id: int):
     return f"video description with id : {id}"
 
@@ -26,8 +30,19 @@ async def patchVideoDescr(id: int):
 
 
 @router.post("/")
-async def postVideo():
-    return "Video posted"
+async def postVideo(
+        background: BackgroundTasks,
+        file: UploadFile = File(...),
+        title: str = Form(...),
+        description: str = Form(...),
+        is_private: bool = Form(...)):
+
+    return await saveVideo(background=background,
+                           file=file,
+                           title=title,
+                           is_private=is_private,
+                           description=description)
+
 
 
 # @router.get("/private/{id}")
