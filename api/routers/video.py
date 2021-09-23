@@ -1,9 +1,15 @@
-from fastapi import APIRouter, File, BackgroundTasks, Form, UploadFile
+from typing import List
+
+from fastapi import APIRouter, File, BackgroundTasks, Form, UploadFile, Depends
+from sqlalchemy.orm import Session
 from starlette.requests import Request
 from starlette.responses import StreamingResponse, HTMLResponse
 from starlette.templating import Jinja2Templates
 
+from api.db.video import VideoDB
 from api.handlers.single_video import saveVideo, readVideo
+from api.schemas.video import VideoGetResponse
+from api.utils.db_base import get_db
 from config import Config
 
 router = APIRouter(prefix="/video",
@@ -12,15 +18,16 @@ router = APIRouter(prefix="/video",
 templates = Jinja2Templates(directory=Config.getTemplatesPath())
 
 
-@router.get("")
+@router.get("", response_model=List[VideoGetResponse])
 async def getListVideos(limit: int = 100,
-                        skip: int = 0):
-    return skip, limit
+                        skip: int = 0,
+                        db: Session = Depends(get_db)):
+    return await VideoDB.getListVideos(db=db, skip=skip, limit=limit)
 
 
-@router.get("/play/{title}")
-async def getPlayVideo(request: Request, title: str) -> StreamingResponse:
-    file, status, content_length, headers = await readVideo(request=request, title=title)
+@router.get("/play/{id}")
+async def getPlayVideo(request: Request, id: int, db: Session = Depends(get_db)) -> StreamingResponse:
+    file, status, content_length, headers = await readVideo(db=db, request=request, id=id)
 
     response = StreamingResponse(file, media_type='video/mp4', status_code=status)
 
@@ -32,21 +39,14 @@ async def getPlayVideo(request: Request, title: str) -> StreamingResponse:
     return response
 
 
-# @router.get("/play/{title}")
-# async def getPlayVideo(title: str):
-#     file = open("files/TEST_9a1c26e4-c3b8-44f2-b460-d399ae264172.mp4", 'rb')
-#     print(file.readline())
-#     return StreamingResponse(file, media_type="video/mp4")
-
-
-@router.get("/{title}", response_class=HTMLResponse)
-async def getVideoDescripton(request: Request, title: str):
-    return templates.TemplateResponse("index.html", {"request": request, "path": title})
+@router.get("/{id}", response_class=HTMLResponse)
+async def getVideoDescripton(request: Request, id: int):
+    return templates.TemplateResponse("index.html", {"request": request, "path": id})
 
 
 @router.patch("/{id}")
-async def patchVideoDescr(id: int):
-    return f"video description with id : {id} is patched"
+async def patchVideoDescription(id: int, db: Session = Depends(get_db)):
+    return VideoDB.getVideoById(db=db, id=id)
 
 
 @router.post("")
@@ -55,9 +55,11 @@ async def postVideo(
         file: UploadFile = File(...),
         title: str = Form(...),
         description: str = Form(...),
-        is_private: bool = Form(...)):
+        is_private: bool = Form(...),
+        db: Session = Depends(get_db)):
 
-    return await saveVideo(background=background,
+    return await saveVideo(db=db,
+                           background=background,
                            file=file,
                            title=title,
                            is_private=is_private,

@@ -1,10 +1,12 @@
 import datetime
-
 from sqlalchemy import Column, Integer, String, TEXT, Boolean, DATETIME
+from sqlalchemy.ext.declarative import declarative_base
+
+Base = declarative_base()
 
 
-class VideoModel:
-    __table_name__ = 'videos'
+class VideoModel(Base):
+    __tablename__ = 'videos'
 
     id: int = Column(Integer, primary_key=True)
     video_path: str = Column(String(1000), unique=True)

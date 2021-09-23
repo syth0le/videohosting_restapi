@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Generator, IO
 
 from fastapi import UploadFile, HTTPException
+from sqlalchemy.orm import Session
 from starlette.background import BackgroundTasks
 from uuid import uuid4
 
@@ -15,6 +16,7 @@ from config import Config
 
 
 async def saveVideo(background: BackgroundTasks,
+                    db: Session,
                     file: UploadFile,
                     title: str,
                     is_private: bool,
@@ -28,14 +30,19 @@ async def saveVideo(background: BackgroundTasks,
 
     # DB SAVER DO
 
+    await VideoDB.createVideo(db=db, title=title, video_path=set_name, description=description, is_private=is_private)
+
     # return title, description, is_private
 
     return f"Video is saved {title} {is_private}"
 
 
-async def readVideo(title: str, request: Request) -> tuple:
-    # await readVideo(title=title)
-    path = Path("files/TEST_9a1c26e4-c3b8-44f2-b460-d399ae264172.mp4")
+async def readVideo(id: str, request: Request, db: Session) -> tuple:
+    id = int(id)
+    from_db = await VideoDB.getVideoById(db=db, id=id)
+    print(from_db.video_path)
+    dir_file = f"{Config.getSavePath()}/{from_db.video_path}"
+    path = Path(dir_file)
     file = path.open('rb')
     print(path.name)
     file_size = path.stat().st_size

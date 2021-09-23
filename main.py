@@ -1,21 +1,16 @@
 import databases
 import sqlalchemy as sqlalchemy
 from fastapi import FastAPI
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
+from api.utils.db_base import Base, database
 from api.routers.video import router as video_router
 from config import Config
 
 app = FastAPI()
 
-AUTH_DATABASE_URL = Config.getPostgresUrl()
-
-metadata = sqlalchemy.MetaData()
-database = databases.Database(AUTH_DATABASE_URL)
-engine = sqlalchemy.create_engine(AUTH_DATABASE_URL)
-
-metadata.create_all(engine)
 app.state.database = database
-
 
 
 @app.on_event("startup")
@@ -31,9 +26,6 @@ async def shutdown() -> None:
     if database_.is_connected:
         await database_.disconnect()
 
-# class MainMata(ormar.ModelMeta):
-#     metadata = metadata
-#     database = database
-
 
 app.include_router(video_router)
+
