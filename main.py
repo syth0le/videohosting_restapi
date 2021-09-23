@@ -16,6 +16,7 @@ metadata.create_all(engine)
 app.state.database = database
 
 
+
 @app.on_event("startup")
 async def startup() -> None:
     database_ = app.state.database
