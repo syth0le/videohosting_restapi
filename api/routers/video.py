@@ -39,7 +39,7 @@ async def getPlayVideo(request: Request, id: int, db: Session = Depends(get_db))
 
 @router.get("/{id}", response_class=HTMLResponse)
 async def getVideoDescripton(request: Request, id: int):
-    return svr.get_template(templates=templates, request=request, id=id)
+    return await svr.get_template(templates=templates, request=request, id=id)
 
 
 @router.post("")
