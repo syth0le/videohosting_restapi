@@ -37,3 +37,12 @@ class VideoDB:
                                 request, id: int):
         response = f"Response {request}{id}"
         return response
+
+    @staticmethod
+    async def deleteVideoById(db: Session,
+                              id: int):
+        video = db.query(VideoModel).filter(VideoModel.id == id).first()
+        db.delete(video)
+        db.commit()
+        return f"Video {id} was deleted."
+

@@ -4,7 +4,8 @@ from pydantic import BaseModel
 
 
 class VideoItem(BaseModel):
-    # id: int
+    # pass
+    id: int
     title: str = Optional[str]
     description: str = Optional[str]
     is_private: bool = Optional[bool]
