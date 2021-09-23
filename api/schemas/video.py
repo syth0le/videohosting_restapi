@@ -16,6 +16,10 @@ class VideoPlayGetResponse(VideoItem):
     pass
 
 
+class VideoUpdateResponse(VideoItem):
+    pass
+
+
 class VideoUpdateRequest(VideoItem):
     pass
 

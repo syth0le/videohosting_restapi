@@ -3,10 +3,11 @@ import sqlalchemy as sqlalchemy
 from fastapi import FastAPI
 
 from api.routers.video import router as video_router
+from config import Config
 
 app = FastAPI()
 
-AUTH_DATABASE_URL = f"postgresql://alterstrada:alterstrada@localhost:5432/alterstrada"
+AUTH_DATABASE_URL = Config.getPostgresUrl()
 
 metadata = sqlalchemy.MetaData()
 database = databases.Database(AUTH_DATABASE_URL)
