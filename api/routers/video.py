@@ -17,7 +17,7 @@ templates = Jinja2Templates(directory=Config.getTemplatesPath())
 
 
 @router.get("")
-async def getListVideos(limit: int = 100,
+async def getListVideos(limit: int = 50,
                         skip: int = 0,
                         db: Session = Depends(get_db)):
     return await lvr.getListVideo(db=db, skip=skip, limit=limit)

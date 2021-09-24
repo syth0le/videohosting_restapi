@@ -1,12 +1,7 @@
-import databases
-import sqlalchemy as sqlalchemy
 from fastapi import FastAPI
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 
 from api.utils.db_base import Base, database
 from api.routers.video import router as video_router
-from config import Config
 
 app = FastAPI()
 
@@ -28,4 +23,3 @@ async def shutdown() -> None:
 
 
 app.include_router(video_router)
-
